@@ -2,6 +2,7 @@ const Tour = require("../models/tourModel");
 
 exports.getAllTours = async (req, res) => {
   try {
+    // console.log(req.query);
     const queryObj = { ...req.query };
     // console.log(req.query);
     const excluededFields = ["page", "sort", "limit", "fields"];
