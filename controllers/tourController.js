@@ -8,16 +8,13 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 class APIFeatures {
-  constructor(query, queryStr) {
+  constructor(query, queryString) {
     this.query = query;
-    this.queryStr = queryStr;
+    this.queryString = queryString;
   }
-}
 
-exports.getAllTours = async (req, res) => {
-  try {
-    // console.log(req.query);
-    const queryObj = { ...req.query };
+  filter() {
+    const queryObj = { ...this.queryString };
     // console.log(req.query);
     const excluededFields = ["page", "sort", "limit", "fields"];
     excluededFields.forEach((el) => delete queryObj[el]);
@@ -25,7 +22,33 @@ exports.getAllTours = async (req, res) => {
     // USE OF ADVANCED QUERY FILTERING
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    let query = Tour.find(JSON.parse(queryStr));
+    this.query = Tour.find(JSON.parse(queryStr));
+
+    return this;
+  }
+
+  sort() {
+    if (this.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      this.quey = this.query.sort(sortBy);
+    } else {
+      this.query = this.query.sort("-createdAt");
+    }
+  }
+}
+
+exports.getAllTours = async (req, res) => {
+  try {
+    // console.log(req.query);
+    // const queryObj = { ...req.query };
+    // // console.log(req.query);
+    // const excluededFields = ["page", "sort", "limit", "fields"];
+    // excluededFields.forEach((el) => delete queryObj[el]);
+
+    // // USE OF ADVANCED QUERY FILTERING
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    // let query = Tour.find(JSON.parse(queryStr));
 
     // SORTING
     if (req.query.sort) {
@@ -55,7 +78,8 @@ exports.getAllTours = async (req, res) => {
       if (skip >= numTours) throw new Error("This page does not exist");
     }
 
-    const tours = await query;
+    const features = new APIFeatures(Tour.find(), req.query).filter().sort();
+    const tours = await features.query;
 
     res.status(200).json({
       status: "success",
