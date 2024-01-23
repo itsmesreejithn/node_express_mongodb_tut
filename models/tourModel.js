@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +9,10 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       maxLength: [40, "A tour must have less or equal to 40 charecters"],
       minLength: [10, "A tour must have less or equal to 10 charecters"],
+      // validate: [
+      //   validator.isAlpha,
+      //   "The tour name must only contain charecters",
+      // ],
     },
     duration: {
       type: Number,
@@ -45,6 +50,12 @@ const tourSchema = new mongoose.Schema(
     },
     priceDiscount: {
       type: Number,
+      validate: {
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: "Discount price should be below regular price",
+      },
     },
     summary: {
       type: String,
