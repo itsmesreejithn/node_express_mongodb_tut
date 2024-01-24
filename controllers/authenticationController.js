@@ -1,3 +1,4 @@
+const util = require("util");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
@@ -49,4 +50,46 @@ exports.login = catchAsync(async (req, res, next) => {
     status: "success",
     token,
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // IF TOKEN IS PRESENT IN HEADER
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  console.log(token);
+
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Please log in to get access", 401)
+    );
+  }
+
+  //   VARIFY THE TOKEN
+  const decoded = await util.promisify(
+    jwt.verify(token, process.env.JWT_SECRET)
+  );
+
+  //   CHECK IF USER STILL EXISTS
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError("The user belonging to this token does no longer exist", 401)
+    );
+  }
+
+  //   CHECK IF USER CHANGED PASSWORD AFTER THE TOKEN WAS ISSUED
+  if (currentUser.changesPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! Please log in again.", 401)
+    );
+  }
+
+  //   GRANT ACCESS TOO PROTECTED ROUTE
+  req.user = freshUser;
+  next();
 });
