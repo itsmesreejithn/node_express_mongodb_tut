@@ -10,6 +10,12 @@ router.post("/login", authenticationController.login);
 router.post("/forgotPassword", authenticationController.forgotPassword);
 router.patch("/resetPassword/:token", authenticationController.resetPassword);
 
+router.patch(
+  "/updatMyPassword",
+  authenticationController.protect,
+  authenticationController.updatPassword
+);
+
 router
   .route("/")
   .get(userContorller.getAllUsers)

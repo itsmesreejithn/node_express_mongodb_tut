@@ -12,6 +12,19 @@ const signToke = (id) => {
   });
   return token;
 };
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToke(user._id);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user: newUser,
+    },
+  });
+};
+
 exports.signUp = catchAsync(async (req, res, next) => {
   //   const newUser = await User.create(req.body);CAUSES SERIOUS SECURITY FLAW AS ANY ONE CAN ASSIGN ROLE OF ADMIN
 
@@ -23,15 +36,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToke(newUser._id);
-
-  res.status(200).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -47,12 +52,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect email or password", 401));
   }
 
-  const token = signToke(user._id);
-
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken(newUser, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -168,10 +168,16 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  const token = signToke(user._id);
+  createSendToken(newUser, 200, res);
+});
 
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+exports.updatPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("password");
+  if (!user.correctPassword(req.body.passwordCurrent, user.password)) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
+
+  user.password = req.body.password;
+  user.passwordCofirm = req.body.passwordConfirm;
+  await user.save();
 });
