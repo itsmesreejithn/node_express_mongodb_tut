@@ -9,11 +9,22 @@ router.post("/login", authenticationController.login);
 
 router.post("/forgotPassword", authenticationController.forgotPassword);
 router.patch("/resetPassword/:token", authenticationController.resetPassword);
+router.delete(
+  "/delteMe",
+  authenticationController.protect,
+  userContorller.deleteMe
+);
 
 router.patch(
   "/updatMyPassword",
   authenticationController.protect,
   authenticationController.updatPassword
+);
+
+router.patch(
+  "/updateMe",
+  authenticationController.protect,
+  userContorller.updateMe
 );
 
 router
