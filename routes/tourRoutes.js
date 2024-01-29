@@ -29,4 +29,12 @@ router
     tourController.deleteTour
   );
 
+router
+  .route("/:tourId/reviews")
+  .post(
+    authenticationController.protect,
+    authenticationController.restrictTo("user"),
+    reviewController.createReview
+  );
+
 module.exports = router;
