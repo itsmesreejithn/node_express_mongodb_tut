@@ -3,11 +3,12 @@ const authenticationController = require("../controllers/authenticationControlle
 const reviewController = require("../controllers/reviewController");
 
 const router = express.Router({ mergeParams: true });
+
+router.use(authenticationController.protect);
 router
   .route("/")
-  .get(authenticationController.protect, reviewController.getAllReviews)
+  .get(reviewController.getAllReviews)
   .post(
-    authenticationController.protect,
     authenticationController.restrictTo("user"),
     reviewController.createReview
   );
