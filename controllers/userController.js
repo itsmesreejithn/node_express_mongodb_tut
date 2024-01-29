@@ -80,3 +80,8 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.getMe = catchAsync(async (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+});

@@ -16,6 +16,13 @@ router.delete(
   userContorller.deleteMe
 );
 
+router.get(
+  "/me",
+  authenticationController.protect,
+  userContorller.getMe,
+  userContorller.getUser
+);
+
 router.patch(
   "/updatMyPassword",
   authenticationController.protect,
