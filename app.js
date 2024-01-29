@@ -2,6 +2,8 @@ const helmet = require("helmet");
 const express = require("express");
 const xxs = require("xss-clean");
 const sani = require("mongo-sanitize");
+const hpp = require("hpp");
+
 // Logging module
 const morgan = require("morgan");
 
@@ -16,9 +18,22 @@ app.use(express.json({ limit: "10kb" }));
 app.use(helmet());
 
 // DATA SANITIZATION
-// app.use(mongoSanitize()); // REMOVES '$' signs
 app.use(xxs()); // REMOVES MALICIOUS HTML CODES AND JS CODES
-app.use(sani);
+app.use(sani); // PREVENTS USEAGE OF "$"
+
+// PREVENT PARAMETER POLLUTION
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
