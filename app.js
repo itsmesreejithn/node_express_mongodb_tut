@@ -1,7 +1,7 @@
 const helmet = require("helmet");
 const express = require("express");
 const xxs = require("xss-clean");
-const sani = require("mongo-sanitize");
+const mongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
 
 // Logging module
@@ -11,15 +11,19 @@ const rateLimit = require("express-rate-limit");
 
 const app = express();
 
+const tourRouter = require("./routes/tourRoutes");
+const userRouter = require("./routes/userRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
+
 // Data from body is added to reqest (middelware)
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json());
 
 // SET SECURITY HEADER
 app.use(helmet());
 
 // DATA SANITIZATION
+app.use(mongoSanitize());
 app.use(xxs()); // REMOVES MALICIOUS HTML CODES AND JS CODES
-app.use(sani); // PREVENTS USEAGE OF "$"
 
 // PREVENT PARAMETER POLLUTION
 app.use(
@@ -49,10 +53,6 @@ app.use("/api", limiter);
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
-
-const tourRouter = require("./routes/tourRoutes");
-const userRouter = require("./routes/userRoutes");
-const reviewRouter = require("./routes/reviewRoutes");
 
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);

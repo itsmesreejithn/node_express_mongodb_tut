@@ -1,10 +1,11 @@
 const express = require("express");
 const tourController = require("../controllers/tourController");
 const authenticationController = require("../controllers/authenticationController");
+const reviewRouter = require("../routes/reviewRoutes");
 
 const router = express.Router();
 
-// router.param("id", tourController.checkId);
+router.use("/:tourId/reviews", reviewRouter);
 
 // ALIASING
 router
@@ -27,14 +28,6 @@ router
     authenticationController.protect,
     authenticationController.restrictTo("admin", "lead-guide"),
     tourController.deleteTour
-  );
-
-router
-  .route("/:tourId/reviews")
-  .post(
-    authenticationController.protect,
-    authenticationController.restrictTo("user"),
-    reviewController.createReview
   );
 
 module.exports = router;
