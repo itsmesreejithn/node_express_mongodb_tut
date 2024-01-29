@@ -1,4 +1,8 @@
+const helmet = require("helmet");
 const express = require("express");
+
+// SET SECURITY HEADER
+app.use(helmet());
 
 // Logging module
 const morgan = require("morgan");
@@ -8,7 +12,7 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 
 // Data from body is added to reqest (middelware)
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
