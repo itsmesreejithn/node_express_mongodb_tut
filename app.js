@@ -1,9 +1,7 @@
 const helmet = require("helmet");
 const express = require("express");
-
-// SET SECURITY HEADER
-app.use(helmet());
-
+const xxs = require("xss-clean");
+const sani = require("mongo-sanitize");
 // Logging module
 const morgan = require("morgan");
 
@@ -13,6 +11,14 @@ const app = express();
 
 // Data from body is added to reqest (middelware)
 app.use(express.json({ limit: "10kb" }));
+
+// SET SECURITY HEADER
+app.use(helmet());
+
+// DATA SANITIZATION
+// app.use(mongoSanitize()); // REMOVES '$' signs
+app.use(xxs()); // REMOVES MALICIOUS HTML CODES AND JS CODES
+app.use(sani);
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -31,6 +37,7 @@ const globalErrorHandler = require("./controllers/errorController");
 
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
+const sanitize = require("mongo-sanitize");
 
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
