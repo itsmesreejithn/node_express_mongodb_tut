@@ -18,11 +18,7 @@ router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
 router
   .route("/")
   .get(tourController.getAllTours)
-  .post(
-    authenticationController.protect,
-    authenticationController.restrictTo("admin, lead-guide"),
-    tourController.createTours
-  );
+  .post(tourController.createTours);
 
 router
   .route("/:id")

@@ -78,8 +78,12 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretToure: {
+      type: Boolean,
+      default: false,
+    },
     startLocation: {
-      // GEO JSON
+      // GeoJSON
       type: {
         type: String,
         default: "Point",
@@ -94,7 +98,7 @@ const tourSchema = new mongoose.Schema(
         type: {
           type: String,
           default: "Point",
-          enum: ["Poing"],
+          enum: ["Point"],
         },
         coordinates: [Number],
         address: String,
@@ -102,7 +106,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -115,20 +124,12 @@ tourSchema.virtual("duartionWeeks").get(function () {
   return this.duration / 7;
 });
 
-// VIRTUAL POPULATE
+// Virtual populate
 tourSchema.virtual("reviews", {
   ref: "Review",
   foreignField: "tour",
   localField: "_id",
 });
-
-// tourSchema.pre("save", async function (next) {
-//   const guidesPromisees = this.guides.map(
-//     async (id) => await User.findById(id)
-//   );
-//   this.guides = await Promise.all(guidesPromisees);
-//   next();
-// });
 
 // DOCUMENT MIDDLEWARE: runs before save() and create()
 tourSchema.pre("save", function () {
