@@ -1,7 +1,7 @@
 const helmet = require("helmet");
 const express = require("express");
 const xxs = require("xss-clean");
-const sani = require("mongo-sanitize");
+const mongoSanitizer = require("express-mongo-sanitize");
 const hpp = require("hpp");
 
 // Logging module
@@ -19,7 +19,7 @@ app.use(helmet());
 
 // DATA SANITIZATION
 app.use(xxs()); // REMOVES MALICIOUS HTML CODES AND JS CODES
-app.use(sani); // PREVENTS USEAGE OF "$"
+app.use(mongoSanitizer()); // PREVENTS USEAGE OF "$"
 
 // PREVENT PARAMETER POLLUTION
 app.use(
