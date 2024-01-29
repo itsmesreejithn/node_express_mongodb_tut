@@ -16,7 +16,7 @@ router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
 
 router
   .route("/")
-  .get(authenticationController.protect, tourController.getAllTours)
+  .get(tourController.getAllTours)
   .post(tourController.createTours);
 
 router
