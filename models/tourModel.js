@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+// const User = require("./userModel");
 
 const tourSchema = new mongoose.Schema(
   {
@@ -77,6 +78,31 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    startLocation: {
+      // GEO JSON
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Poing"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
   },
   {
     toJSON: { virtuals: true },
@@ -88,6 +114,14 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual("duartionWeeks").get(function () {
   return this.duration / 7;
 });
+
+// tourSchema.pre("save", async function (next) {
+//   const guidesPromisees = this.guides.map(
+//     async (id) => await User.findById(id)
+//   );
+//   this.guides = await Promise.all(guidesPromisees);
+//   next();
+// });
 
 // DOCUMENT MIDDLEWARE: runs before save() and create()
 tourSchema.pre("save", function () {
@@ -105,6 +139,13 @@ tourSchema.pre(/^find/, function (next) {
 });
 tourSchema.post(/^find/, function (doc, next) {
   console.log(doc), next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
 });
 
 // AGGRIGATION MIDDLEWARE
