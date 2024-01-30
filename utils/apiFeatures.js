@@ -6,13 +6,13 @@ class APIFeatures {
 
   filter() {
     const queryObj = { ...this.queryString };
-    // console.log(req.query);
-    const excluededFields = ["page", "sort", "limit", "fields"];
-    excluededFields.forEach((el) => delete queryObj[el]);
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach(el => delete queryObj[el]);
 
-    // USE OF ADVANCED QUERY FILTERING
+    // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
     this.query = this.query.find(JSON.parse(queryStr));
 
     return this;
@@ -20,21 +20,21 @@ class APIFeatures {
 
   sort() {
     if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(",").join(" ");
+      const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
     } else {
-      this.query = this.query.sort("-createdAt");
+      this.query = this.query.sort('-createdAt');
     }
 
     return this;
   }
 
-  limitingFields() {
+  limitFields() {
     if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(",").join(" ");
+      const fields = this.queryString.fields.split(',').join(' ');
       this.query = this.query.select(fields);
     } else {
-      this.query = this.query.select("-__v");
+      this.query = this.query.select('-__v');
     }
 
     return this;
@@ -50,5 +50,4 @@ class APIFeatures {
     return this;
   }
 }
-
 module.exports = APIFeatures;

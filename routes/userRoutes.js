@@ -1,41 +1,33 @@
-const express = require("express");
-const userContorller = require("../controllers/userController");
-const authenticationController = require("../controllers/authenticationController");
+const express = require('express');
+const userController = require('./../controllers/userController');
+const authController = require('./../controllers/authController');
 
 const router = express.Router();
 
-router.post("/signup", authenticationController.signUp);
-router.post("/login", authenticationController.login);
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+router.post('/forgotPassword', authController.forgotPassword);
+router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.post("/forgotPassword", authenticationController.forgotPassword);
-router.patch("/resetPassword/:token", authenticationController.resetPassword);
-router.delete(
-  "/delteMe",
-  authenticationController.protect,
-  userContorller.deleteMe
-);
+// Protect all routes after this middleware
+router.use(authController.protect);
 
-router.patch(
-  "/updatMyPassword",
-  authenticationController.protect,
-  authenticationController.updatPassword
-);
+router.patch('/updateMyPassword', authController.updatePassword);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
 
-router.patch(
-  "/updateMe",
-  authenticationController.protect,
-  userContorller.updateMe
-);
+router.use(authController.restrictTo('admin'));
 
 router
-  .route("/")
-  .get(userContorller.getAllUsers)
-  .post(userContorller.createUser);
+  .route('/')
+  .get(userController.getAllUsers)
+  .post(userController.createUser);
 
 router
-  .route("/:id")
-  .get(userContorller.getUser)
-  .patch(userContorller.updateUser)
-  .delete(userContorller.deleteUser);
+  .route('/:id')
+  .get(userController.getUser)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;
