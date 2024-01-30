@@ -48,3 +48,6 @@ reviewSchema.pre(/^find/, function (next) {
   });
   next();
 });
+
+const Review = mongoose.model("Review", reviewSchema);
+module.exports = Review;
