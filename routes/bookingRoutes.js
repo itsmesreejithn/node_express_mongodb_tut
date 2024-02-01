@@ -1,5 +1,5 @@
 const express = require("express");
-const bookingControler = require("../controllers/bookingController");
+const bookingController = require("../controllers/bookingController");
 const authController = require("../controllers/authController");
 
 const router = express.Router();
@@ -7,7 +7,20 @@ const router = express.Router();
 router.get(
   "/checkout-session/:tourID",
   authController.protect,
-  bookingControler.getCheckoutSession
+  bookingController.getCheckoutSession
 );
+
+router.use(authController.restrictTo("admin", "lead-guide"));
+
+router
+  .route("/")
+  .get(bookingController.getAllBooking)
+  .post(bookingController.createBookgin);
+
+router
+  .route("/:id")
+  .get(bookingController.getBooking)
+  .patch(bookingController.updateBooking)
+  .delete(bookingController.deleteBooking);
 
 module.exports = router;
